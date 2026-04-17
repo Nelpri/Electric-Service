@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Servicio Técnico Movilidad Eléctrica</title>
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+
+<body>
+
+<h1>Servicio Técnico</h1>
+
+<div class="container">
+  <form id="form">
+
+    <!-- Cliente -->
+    <label>Nombre</label>
+    <input type="text" id="nombre" required>
+
+    <label>Teléfono</label>
+    <input type="tel" id="telefono" required>
+
+    <!-- Vehículo -->
+    <label>Tipo de vehículo</label>
+    <select id="vehiculo">
+      <option>Bicicleta eléctrica</option>
+      <option>Scooter</option>
+      <option>Patineta eléctrica</option>
+    </select>
+
+    <!-- Servicio -->
+    <label>Servicio</label>
+    <select id="servicio">
+      <option value="30000">Diagnóstico - $30.000</option>
+      <option value="60000">Mantenimiento básico - $60.000</option>
+      <option value="120000">Mantenimiento completo - $120.000</option>
+      <option value="0">Reparación general - Presupuesto</option>
+    </select>
+
+    <!-- Estado -->
+    <label>Estado</label>
+    <select id="estado">
+      <option>Pendiente</option>
+      <option>En proceso</option>
+      <option>Listo</option>
+      <option>Entregado</option>
+    </select>
+
+    <!-- Checklist -->
+    <div class="checklist">
+      <strong>Checklist revisión</strong>
+
+      <label><input type="checkbox" value="Batería"> Batería</label>
+      <label><input type="checkbox" value="Motor"> Motor</label>
+      <label><input type="checkbox" value="Frenos"> Frenos</label>
+      <label><input type="checkbox" value="Luces"> Luces</label>
+      <label><input type="checkbox" value="Controlador"> Controlador</label>
+      <label><input type="checkbox" value="Llantas"> Llantas</label>
+      <label><input type="checkbox" value="Cableado"> Cableado</label>
+    </div>
+
+    <!-- Observaciones -->
+    <label>Observaciones</label>
+    <textarea id="obs"></textarea>
+
+    <!-- Foto -->
+    <label>Foto</label>
+    <input type="file" id="foto" accept="image/*" capture="environment">
+
+    <div class="img-preview" id="previewContainer" hidden>
+      <img id="preview">
+      <button type="button" id="removePhoto" class="small">Eliminar</button>
+    </div>
+
+    <!-- Acciones -->
+    <div class="actions">
+      <button type="submit" class="primary">Guardar</button>
+      <button type="button" id="clearAll" class="secondary">Limpiar</button>
+    </div>
+
+  </form>
+</div>
+
+<!-- Lista -->
+<div class="container">
+  <h2>Registros</h2>
+  <ul id="lista"></ul>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

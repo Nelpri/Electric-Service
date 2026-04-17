@@ -1,0 +1,8 @@
+.container {
+    max-width: 720px;
+    margin: 12px auto;
+    background: var(--color-card);
+    padding: 16px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
