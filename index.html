@@ -1,137 +1,104 @@
-// ==============================
-// 📌 SELECTORES
-// ==============================
-const form = document.getElementById("form");
-const lista = document.getElementById("lista");
-const preview = document.getElementById("preview");
-const inputFoto = document.getElementById("foto");
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Electric Service</title>
 
-// ==============================
-// 📦 STORAGE
-// ==============================
-const STORAGE_KEY = "registrosElectricos";
+  <!-- CSS modular -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
 
-// ==============================
-// 🧠 UTILIDADES
-// ==============================
+<body>
 
-// Obtener fecha actual
-function obtenerFecha() {
-  const fecha = new Date();
-  return fecha.toLocaleString();
-}
+  <h1>Registro de Servicios Eléctricos</h1>
 
-// Obtener checklist
-function obtenerChecklist() {
-  return [...document.querySelectorAll(".checklist input:checked")]
-    .map(el => el.value);
-}
+  <main class="container">
+    <form id="form">
 
-// Guardar en localStorage
-function guardarEnStorage(data) {
-  const registros = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  registros.push(data);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(registros));
-}
+      <!-- Cliente -->
+      <fieldset class="form-section">
+        <legend>Datos del cliente</legend>
 
-// Cargar registros
-function cargarRegistros() {
-  const registros = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  lista.innerHTML = "";
+        <div class="field">
+          <label>Nombre</label>
+          <input type="text" id="nombre" placeholder="Ej: Juan Pérez" required>
+        </div>
 
-  registros.forEach((registro, index) => {
-    crearItem(registro, index);
-  });
-}
+        <div class="field">
+          <label>Teléfono</label>
+          <input type="tel" id="telefono" placeholder="Ej: 3001234567">
+        </div>
+      </fieldset>
 
-// Eliminar registro
-function eliminarRegistro(index) {
-  const registros = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  registros.splice(index, 1);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(registros));
-  cargarRegistros();
-}
+      <!-- Servicio -->
+      <fieldset class="form-section">
+        <legend>Detalle del servicio</legend>
 
-// ==============================
-// 🎨 UI
-// ==============================
+        <div class="field">
+          <label>Tipo de trabajo</label>
+          <select id="tipo">
+            <option>Revisión</option>
+            <option>Instalación</option>
+            <option>Reparación</option>
+          </select>
+        </div>
 
-// Crear elemento en lista
-function crearItem(data, index) {
-  const li = document.createElement("li");
+        <div class="field">
+          <label>Observaciones</label>
+          <textarea id="descripcion" placeholder="Describe el trabajo..."></textarea>
+        </div>
+      </fieldset>
 
-  li.innerHTML = `
-    <strong>${data.nombre}</strong> (${data.telefono || "Sin teléfono"})<br>
-    <em>${data.tipo}</em><br>
-    ${data.descripcion || "Sin descripción"}<br>
-    <small>✔ ${data.checklist.length ? data.checklist.join(", ") : "Sin revisión"}</small><br>
-    <small>📅 ${data.fecha}</small>
-    <br><br>
-    <button class="small" data-id="${index}">Eliminar</button>
-  `;
+      <!-- Checklist -->
+      <fieldset class="form-section">
+        <legend>Checklist de revisión</legend>
 
-  lista.appendChild(li);
-}
+        <div class="checklist">
+          <div class="checklist-grid">
 
-// ==============================
-// 📸 PREVIEW IMAGEN
-// ==============================
-inputFoto.addEventListener("change", () => {
-  const file = inputFoto.files[0];
+            <label><input type="checkbox" value="Breaker"> Breaker</label>
+            <label><input type="checkbox" value="Cableado"> Cableado</label>
+            <label><input type="checkbox" value="Tomacorrientes"> Tomas</label>
+            <label><input type="checkbox" value="Iluminación"> Iluminación</label>
+            <label><input type="checkbox" value="Tierra"> Tierra</label>
+            <label><input type="checkbox" value="Voltaje"> Voltaje</label>
 
-  if (!file) {
-    preview.innerHTML = "<p class='small'>Sin imagen</p>";
-    return;
-  }
+          </div>
+        </div>
+      </fieldset>
 
-  const reader = new FileReader();
+      <!-- Foto -->
+      <fieldset class="form-section">
+        <legend>Foto del trabajo</legend>
 
-  reader.onload = () => {
-    preview.innerHTML = `<img src="${reader.result}" alt="preview">`;
-  };
+        <input type="file" id="foto" accept="image/*">
 
-  reader.readAsDataURL(file);
-});
+        <div class="img-preview" id="preview">
+          <p class="small">Sin imagen</p>
+        </div>
+      </fieldset>
 
-// ==============================
-// 📥 SUBMIT FORM
-// ==============================
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
+      <!-- Botones -->
+      <div class="actions">
+        <button type="submit" class="primary">Guardar</button>
+        <button type="reset" class="secondary">Limpiar</button>
+      </div>
 
-  const data = {
-    nombre: document.getElementById("nombre").value.trim(),
-    telefono: document.getElementById("telefono").value.trim(),
-    tipo: document.getElementById("tipo").value,
-    descripcion: document.getElementById("descripcion").value.trim(),
-    checklist: obtenerChecklist(),
-    fecha: obtenerFecha()
-  };
+    </form>
+  </main>
 
-  // Validación básica (sin rodeos)
-  if (!data.nombre) {
-    alert("El nombre es obligatorio.");
-    return;
-  }
+  <!-- Lista -->
+  <section class="container">
+    <h2>Registros</h2>
+    <ul id="lista"></ul>
+  </section>
 
-  guardarEnStorage(data);
-  crearItem(data);
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="js/app.js"></script>
 
-  form.reset();
-  preview.innerHTML = "<p class='small'>Sin imagen</p>";
-});
-
-// ==============================
-// 🗑️ ELIMINAR REGISTRO
-// ==============================
-lista.addEventListener("click", (e) => {
-  if (e.target.classList.contains("small")) {
-    const index = e.target.getAttribute("data-id");
-    eliminarRegistro(index);
-  }
-});
-
-// ==============================
-// 🚀 INICIO
-// ==============================
-document.addEventListener("DOMContentLoaded", cargarRegistros);
+</body>
+</html>
