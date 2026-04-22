@@ -1,117 +1,137 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Servicio Técnico Movilidad Eléctrica</title>
+// ==============================
+// 📌 SELECTORES
+// ==============================
+const form = document.getElementById("form");
+const lista = document.getElementById("lista");
+const preview = document.getElementById("preview");
+const inputFoto = document.getElementById("foto");
 
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/layout.css">
-  <link rel="stylesheet" href="css/components.css">
-</head>
+// ==============================
+// 📦 STORAGE
+// ==============================
+const STORAGE_KEY = "registrosElectricos";
 
-<body>
+// ==============================
+// 🧠 UTILIDADES
+// ==============================
 
-<h1>Servicio Técnico</h1>
+// Obtener fecha actual
+function obtenerFecha() {
+  const fecha = new Date();
+  return fecha.toLocaleString();
+}
 
-<div class="container">
-  <form id="form">
+// Obtener checklist
+function obtenerChecklist() {
+  return [...document.querySelectorAll(".checklist input:checked")]
+    .map(el => el.value);
+}
 
-    <fieldset class="form-section">
-      <legend>Cliente</legend>
-      <div class="field">
-        <label for="nombre">Nombre</label>
-        <input type="text" id="nombre" name="nombre" placeholder="Nombre completo" required autocomplete="name">
-      </div>
-      <div class="field">
-        <label for="cedula">Cédula</label>
-        <input type="text" id="cedula" name="cedula" inputmode="numeric" pattern="[0-9.\-\s]*" maxlength="16" placeholder="Ej. 12.345.678" autocomplete="off" title="Solo números, puntos o guiones">
-      </div>
-      <div class="field">
-        <label for="telefono">Teléfono</label>
-        <input type="tel" id="telefono" name="telefono" placeholder="Ej. 300 123 4567" required autocomplete="tel">
-      </div>
-    </fieldset>
+// Guardar en localStorage
+function guardarEnStorage(data) {
+  const registros = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  registros.push(data);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(registros));
+}
 
-    <fieldset class="form-section">
-      <legend>Vehículo y servicio</legend>
-      <div class="field">
-        <label for="idVehiculo">ID del vehículo</label>
-        <input type="text" id="idVehiculo" name="id_vehiculo" placeholder="Ej. VE-2024-001" maxlength="40" autocomplete="off">
-      </div>
-      <div class="field">
-        <label for="vehiculo">Tipo de vehículo</label>
-        <select id="vehiculo" name="vehiculo">
-          <option>Bicicleta eléctrica</option>
-          <option>Scooter</option>
-          <option>Patineta eléctrica</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="servicio">Servicio</label>
-        <select id="servicio" name="servicio">
-          <option value="30000">Diagnóstico — $30.000</option>
-          <option value="60000">Mantenimiento básico — $60.000</option>
-          <option value="120000">Mantenimiento completo — $120.000</option>
-          <option value="0">Reparación general — Presupuesto</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="estado">Estado</label>
-        <select id="estado" name="estado">
-          <option>Pendiente</option>
-          <option>En proceso</option>
-          <option>Listo</option>
-          <option>Entregado</option>
-        </select>
-      </div>
-    </fieldset>
+// Cargar registros
+function cargarRegistros() {
+  const registros = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  lista.innerHTML = "";
 
-    <fieldset class="form-section">
-      <legend>Checklist revisión</legend>
-      <div class="checklist">
-        <div class="checklist-grid">
-          <label><input type="checkbox" value="Batería"> Batería</label>
-          <label><input type="checkbox" value="Motor"> Motor</label>
-          <label><input type="checkbox" value="Frenos"> Frenos</label>
-          <label><input type="checkbox" value="Luces"> Luces</label>
-          <label><input type="checkbox" value="Controlador"> Controlador</label>
-          <label><input type="checkbox" value="Llantas"> Llantas</label>
-          <label><input type="checkbox" value="Cableado"> Cableado</label>
-        </div>
-      </div>
-    </fieldset>
+  registros.forEach((registro, index) => {
+    crearItem(registro, index);
+  });
+}
 
-    <fieldset class="form-section">
-      <legend>Detalles</legend>
-      <div class="field">
-        <label for="obs">Observaciones</label>
-        <textarea id="obs" name="obs" placeholder="Notas adicionales sobre el equipo o la visita…" rows="4"></textarea>
-      </div>
-      <div class="field">
-        <label for="foto">Foto</label>
-        <input type="file" id="foto" name="foto" accept="image/*" capture="environment">
-      </div>
-      <div class="img-preview" id="previewContainer" hidden>
-        <img id="preview" alt="Vista previa">
-        <button type="button" id="removePhoto" class="small">Eliminar foto</button>
-      </div>
-    </fieldset>
+// Eliminar registro
+function eliminarRegistro(index) {
+  const registros = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  registros.splice(index, 1);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(registros));
+  cargarRegistros();
+}
 
-    <div class="actions">
-      <button type="submit" class="primary">Guardar</button>
-      <button type="button" id="clearAll" class="secondary">Limpiar</button>
-    </div>
+// ==============================
+// 🎨 UI
+// ==============================
 
-  </form>
-</div>
+// Crear elemento en lista
+function crearItem(data, index) {
+  const li = document.createElement("li");
 
-<div class="container">
-  <h2>Registros</h2>
-  <ul id="lista"></ul>
-</div>
+  li.innerHTML = `
+    <strong>${data.nombre}</strong> (${data.telefono || "Sin teléfono"})<br>
+    <em>${data.tipo}</em><br>
+    ${data.descripcion || "Sin descripción"}<br>
+    <small>✔ ${data.checklist.length ? data.checklist.join(", ") : "Sin revisión"}</small><br>
+    <small>📅 ${data.fecha}</small>
+    <br><br>
+    <button class="small" data-id="${index}">Eliminar</button>
+  `;
 
-<script src="app.js"></script>
-</body>
-</html>
+  lista.appendChild(li);
+}
+
+// ==============================
+// 📸 PREVIEW IMAGEN
+// ==============================
+inputFoto.addEventListener("change", () => {
+  const file = inputFoto.files[0];
+
+  if (!file) {
+    preview.innerHTML = "<p class='small'>Sin imagen</p>";
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    preview.innerHTML = `<img src="${reader.result}" alt="preview">`;
+  };
+
+  reader.readAsDataURL(file);
+});
+
+// ==============================
+// 📥 SUBMIT FORM
+// ==============================
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const data = {
+    nombre: document.getElementById("nombre").value.trim(),
+    telefono: document.getElementById("telefono").value.trim(),
+    tipo: document.getElementById("tipo").value,
+    descripcion: document.getElementById("descripcion").value.trim(),
+    checklist: obtenerChecklist(),
+    fecha: obtenerFecha()
+  };
+
+  // Validación básica (sin rodeos)
+  if (!data.nombre) {
+    alert("El nombre es obligatorio.");
+    return;
+  }
+
+  guardarEnStorage(data);
+  crearItem(data);
+
+  form.reset();
+  preview.innerHTML = "<p class='small'>Sin imagen</p>";
+});
+
+// ==============================
+// 🗑️ ELIMINAR REGISTRO
+// ==============================
+lista.addEventListener("click", (e) => {
+  if (e.target.classList.contains("small")) {
+    const index = e.target.getAttribute("data-id");
+    eliminarRegistro(index);
+  }
+});
+
+// ==============================
+// 🚀 INICIO
+// ==============================
+document.addEventListener("DOMContentLoaded", cargarRegistros);
