@@ -1,8 +1,5 @@
 .container {
-  width: min(560px, calc(100% - 2rem));
-  margin: 0 auto 2.5rem;
-}
-
-.container:first-of-type {
-  margin-top: 1rem;
+  width: min(600px, 100%);
+  margin: auto;
+  padding: 1rem;
 }

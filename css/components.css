@@ -252,3 +252,8 @@ button.small:hover {
   border-radius: var(--radius-sm);
   font-size: 0.875rem;
 }
+
+.small {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
