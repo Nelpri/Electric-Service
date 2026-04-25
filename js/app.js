@@ -84,9 +84,9 @@ async function obtenerProximoOrden() {
 
 async function subirImagen(file) {
   const fileName = `${Date.now()}-${file.name.replace(/\s/g, "_")}`;
-  const { error: uploadError } = await supabaseClient.storage.from("fotos").upload(fileName, file);
+  const { error: uploadError } = await supabaseClient.storage.from("Fotos").upload(fileName, file);
   if (uploadError) throw new Error("Error subiendo imagen: " + uploadError.message);
-  const { data: urlData } = supabaseClient.storage.from("fotos").getPublicUrl(fileName);
+  const { data: urlData } = supabaseClient.storage.from("Fotos").getPublicUrl(fileName);
   return urlData.publicUrl;
 }
 
