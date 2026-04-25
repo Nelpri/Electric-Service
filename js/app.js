@@ -1,7 +1,7 @@
 // ─── CONFIGURACIÓN SUPABASE ───────────────────────────────────────────────────
 const SUPABASE_URL = "https://mxtljwiyjbofnqcgsetu.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14dGxqd2l5amJvZm5xY2dzZXR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTU5NTcsImV4cCI6MjA5MjI5MTk1N30.tiCaq6Qi7ZlnuMb2pk3W5etanyystdmy7OWuvtlup1E";
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ==============================
 // 📌 SELECTORES DOM
@@ -72,7 +72,7 @@ function resetearFormulario() {
 // 🔌 SUPABASE OPERACIONES
 // ==============================
 async function obtenerProximoOrden() {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("registros")
     .select("orden")
     .order("orden", { ascending: false })
@@ -84,20 +84,20 @@ async function obtenerProximoOrden() {
 
 async function subirImagen(file) {
   const fileName = `${Date.now()}-${file.name.replace(/\s/g, "_")}`;
-  const { error: uploadError } = await supabase.storage.from("fotos").upload(fileName, file);
+  const { error: uploadError } = await supabaseClient.storage.from("fotos").upload(fileName, file);
   if (uploadError) throw new Error("Error subiendo imagen: " + uploadError.message);
-  const { data: urlData } = supabase.storage.from("fotos").getPublicUrl(fileName);
+  const { data: urlData } = supabaseClient.storage.from("fotos").getPublicUrl(fileName);
   return urlData.publicUrl;
 }
 
 async function guardarRegistro(registro) {
-  const { error } = await supabase.from("registros").insert([registro]);
+  const { error } = await supabaseClient.from("registros").insert([registro]);
   if (error) throw new Error(error.message);
 }
 
 async function cargarRegistros() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from("registros")
       .select("*")
       .order("creado_en", { ascending: false })
