@@ -10,12 +10,14 @@ const form = document.getElementById("form");
 const lista = document.getElementById("lista");
 const preview = document.getElementById("preview");
 const btnGuardar = document.getElementById("btnGuardar");
-const fotoInput = document.getElementById("foto");   // unificado con capture
+const fotoInput = document.getElementById("foto");
 const selectServicio = document.getElementById("tipo");
 const precioVista = document.getElementById("precioVista");
 const selectVehiculo = document.getElementById("vehiculo");
 const otroContainer = document.getElementById("vehiculoOtroContainer");
 const otroInput = document.getElementById("vehiculoOtro");
+const fechaIngreso = document.getElementById("fechaIngreso");
+const fechaEntrega = document.getElementById("fechaEntrega");
 
 // ==============================
 // 🧠 UTILIDADES
@@ -41,7 +43,6 @@ function mostrarPreview(file) {
   reader.readAsDataURL(file);
 }
 
-// Mostrar/ocultar campo "Otro vehículo"
 function toggleOtroVehiculo() {
   if (selectVehiculo.value === "otro") {
     otroContainer.style.display = "block";
@@ -66,6 +67,10 @@ function resetearFormulario() {
   preview.innerHTML = '<p class="small">Sin imagen</p>';
   toggleOtroVehiculo();
   actualizarPrecio();
+  if (fechaIngreso) {
+    const hoy = new Date().toISOString().split('T')[0];
+    fechaIngreso.value = hoy;
+  }
 }
 
 // ==============================
@@ -118,6 +123,8 @@ async function cargarRegistros() {
         🔧 ${escapeHtml(item.servicio) || "—"}<br>
         💰 ${item.precio ? "$" + item.precio.toLocaleString() : "A convenir"}<br>
         📌 Estado: ${escapeHtml(item.estado)}<br>
+        📅 Ingreso: ${escapeHtml(item.fecha_ingreso) || "—"}<br>
+        📅 Entrega: ${escapeHtml(item.fecha_entrega) || "—"}<br>
         ✔ ${item.checklist?.join(", ") || "Sin revisión"}<br>
         📝 ${escapeHtml(item.obs) || ""}<br>
         ${item.foto_url ? `<img src="${item.foto_url}" width="120" style="border-radius:8px; margin-top:6px;">` : ""}
@@ -135,7 +142,6 @@ async function cargarRegistros() {
 // 📸 EVENTOS
 // ==============================
 fotoInput.addEventListener("change", (e) => mostrarPreview(e.target.files[0]));
-
 selectVehiculo.addEventListener("change", toggleOtroVehiculo);
 selectServicio.addEventListener("change", actualizarPrecio);
 
@@ -153,6 +159,12 @@ form.addEventListener("submit", async (e) => {
   const nombre = document.getElementById("nombre").value.trim();
   if (!nombre) {
     alert("El nombre del cliente es obligatorio");
+    return;
+  }
+
+  // Validar fechas
+  if (fechaIngreso.value && fechaEntrega.value && fechaEntrega.value < fechaIngreso.value) {
+    alert("La fecha de entrega no puede ser anterior a la fecha de ingreso");
     return;
   }
 
@@ -191,7 +203,9 @@ form.addEventListener("submit", async (e) => {
       estado: document.getElementById("estado").value,
       checklist: obtenerChecklist(),
       obs: document.getElementById("descripcion").value.trim(),
-      foto_url
+      foto_url,
+      fecha_ingreso: fechaIngreso.value || null,
+      fecha_entrega: fechaEntrega.value || null
     };
 
     await guardarRegistro(registro);
@@ -214,4 +228,8 @@ document.addEventListener("DOMContentLoaded", () => {
   actualizarPrecio();
   toggleOtroVehiculo();
   cargarRegistros();
+  if (fechaIngreso && !fechaIngreso.value) {
+    const hoy = new Date().toISOString().split('T')[0];
+    fechaIngreso.value = hoy;
+  }
 });
