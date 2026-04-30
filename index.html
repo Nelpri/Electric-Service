@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Servicio Técnico | Taller de Movilidad Eléctrica</title>
+  <title>Electric Service | Scorpion Electric</title>
 
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/base.css">
@@ -14,124 +14,154 @@
 
   <main class="container">
 
-    <h1>⚡ Servicio Técnico</h1>
+    <div class="header-logo">
+      <img src="img/logo.png" alt="Scorpion Electric" class="logo">
+      <h1>⚡ Servicio Técnico</h1>
+    </div>
 
-    <form id="form">
+    <!-- SECCIÓN DE LOGIN / REGISTRO -->
+    <div id="authSection" class="auth-card">
+      <div id="loginForm">
+        <h2>🔐 Acceso</h2>
+        <input type="email" id="loginEmail" placeholder="Email" class="full-width">
+        <input type="password" id="loginPassword" placeholder="Contraseña" class="full-width">
+        <button id="btnLogin" class="primary full-width">Iniciar sesión</button>
+        <button id="btnShowRegister" class="secondary full-width margin-top">Registrarse</button>
+      </div>
+      <div id="registerForm" style="display:none;">
+        <h2>📝 Registro</h2>
+        <input type="email" id="regEmail" placeholder="Email" class="full-width">
+        <input type="password" id="regPassword" placeholder="Contraseña" class="full-width">
+        <button id="btnRegister" class="primary full-width">Crear cuenta</button>
+        <button id="btnShowLogin" class="secondary full-width margin-top">Volver a inicio</button>
+      </div>
+    </div>
 
-      <!-- CLIENTE -->
-      <fieldset class="form-section">
-        <legend>Cliente</legend>
-        <div class="field">
-          <input id="nombre" placeholder="Nombre completo" required>
-        </div>
-        <div class="field">
-          <input id="cedula" placeholder="Cédula / NIT">
-        </div>
-        <div class="field">
-          <input id="telefono" placeholder="Teléfono / Whatsapp">
-        </div>
-      </fieldset>
-
-      <!-- VEHÍCULO -->
-      <fieldset class="form-section">
-        <legend>Vehículo</legend>
-        <div class="field">
-          <select id="vehiculo">
-            <option value="">Seleccionar vehículo</option>
-            <option value="Scooter eléctrico">Scooter eléctrico</option>
-            <option value="Bicicleta eléctrica">Bicicleta eléctrica</option>
-            <option value="Moto eléctrica">Moto eléctrica</option>
-            <option value="Patineta eléctrica">Patineta eléctrica</option>
-            <option value="otro">Otro (especificar)</option>
-          </select>
-        </div>
-        <div class="field" id="vehiculoOtroContainer" style="display:none;">
-          <input type="text" id="vehiculoOtro" placeholder="Especificar vehículo">
-        </div>
-        <div class="field">
-          <input id="idVehiculo" placeholder="Número de serie / placa">
-        </div>
-      </fieldset>
-
-      <!-- SERVICIO -->
-      <fieldset class="form-section">
-        <legend>Servicio</legend>
-        <div class="field">
-          <select id="tipo">
-            <option value="30000">Diagnóstico — $30.000</option>
-            <option value="60000">Mantenimiento básico — $60.000</option>
-            <option value="120000">Mantenimiento completo — $120.000</option>
-            <option value="presupuesto">Reparación general — Presupuesto</option>
-          </select>
-        </div>
-        <div class="field">
-          <select id="estado">
-            <option>Pendiente</option>
-            <option>En proceso</option>
-            <option>Finalizado</option>
-          </select>
-        </div>
-        <div class="field">
-          <p>Precio estimado: <strong id="precioVista">$0</strong></p>
-        </div>
-      </fieldset>
-
-      <!-- CHECKLIST -->
-      <fieldset class="form-section">
-        <legend>Checklist revisión</legend>
-        <div class="checklist-grid">
-          <label><input type="checkbox" value="Batería"> Batería</label>
-          <label><input type="checkbox" value="Motor"> Motor</label>
-          <label><input type="checkbox" value="Frenos"> Frenos</label>
-          <label><input type="checkbox" value="Luces"> Luces</label>
-          <label><input type="checkbox" value="Controlador"> Controlador</label>
-          <label><input type="checkbox" value="Llantas"> Llantas</label>
-          <label><input type="checkbox" value="Cableado"> Cableado</label>
-        </div>
-      </fieldset>
-
-      <!-- DETALLES -->
-      <fieldset class="form-section">
-        <legend>Observaciones</legend>
-        <textarea id="descripcion" placeholder="Notas adicionales, síntomas, repuestos necesarios..."></textarea>
-      </fieldset>
-
-      <!-- FECHAS -->
-      <fieldset class="form-section">
-        <legend>Fechas</legend>
-        <div class="field">
-          <input type="date" id="fechaIngreso" required>
-        </div>
-        <div class="field">
-          <input type="date" id="fechaEntrega">
-        </div>
-      </fieldset>
-
-      <!-- FOTO con captura de cámara integrada -->
-      <fieldset class="form-section">
-        <legend>Evidencia fotográfica</legend>
-        <div class="field">
-          <input type="file" id="foto" accept="image/*" capture="environment">
-          <small class="small">📸 En móvil se abrirá la cámara trasera. En escritorio podrás seleccionar un archivo.</small>
-        </div>
-        <div id="preview" class="img-preview">
-          <p class="small">Sin imagen</p>
-        </div>
-      </fieldset>
-
-      <div class="actions">
-        <button type="submit" class="primary" id="btnGuardar">Guardar orden</button>
-        <button type="reset" class="secondary" id="btnLimpiar">Limpiar formulario</button>
+    <!-- FORMULARIO PRINCIPAL (solo se muestra tras login) -->
+    <div id="appSection" style="display:none;">
+      <div class="user-info">
+        <span>👤 <span id="userEmail"></span></span>
+        <button id="btnLogout" class="small">Cerrar sesión</button>
       </div>
 
-    </form>
+      <form id="form">
+        <!-- CLIENTE -->
+        <fieldset class="form-section">
+          <legend>Cliente</legend>
+          <div class="field">
+            <input id="nombre" placeholder="Nombre completo" required>
+          </div>
+          <div class="field">
+            <input id="cedula" placeholder="Cédula / NIT">
+          </div>
+          <div class="field">
+            <input id="telefono" placeholder="Teléfono / Whatsapp">
+          </div>
+        </fieldset>
 
-    <h2>📋 Últimos registros</h2>
-    <ul id="lista"></ul>
+        <!-- VEHÍCULO -->
+        <fieldset class="form-section">
+          <legend>Vehículo</legend>
+          <div class="field">
+            <select id="vehiculo">
+              <option value="">Seleccionar vehículo</option>
+              <option value="Scooter eléctrico">Scooter eléctrico</option>
+              <option value="Bicicleta eléctrica">Bicicleta eléctrica</option>
+              <option value="Moto eléctrica">Moto eléctrica</option>
+              <option value="Patineta eléctrica">Patineta eléctrica</option>
+              <option value="otro">Otro (especificar)</option>
+            </select>
+          </div>
+          <div class="field" id="vehiculoOtroContainer" style="display:none;">
+            <input type="text" id="vehiculoOtro" placeholder="Especificar vehículo">
+          </div>
+          <div class="field">
+            <input id="idVehiculo" placeholder="Número de serie / placa">
+          </div>
+        </fieldset>
+
+        <!-- SERVICIO -->
+        <fieldset class="form-section">
+          <legend>Servicio</legend>
+          <div class="field">
+            <select id="tipo">
+              <option value="30000">Diagnóstico — $30.000</option>
+              <option value="60000">Mantenimiento básico — $60.000</option>
+              <option value="120000">Mantenimiento completo — $120.000</option>
+              <option value="presupuesto">Reparación general — Presupuesto</option>
+            </select>
+          </div>
+          <div class="field">
+            <select id="estado">
+              <option>Pendiente</option>
+              <option>En proceso</option>
+              <option>Finalizado</option>
+            </select>
+          </div>
+          <div class="field">
+            <p>Precio estimado: <strong id="precioVista">$0</strong></p>
+          </div>
+        </fieldset>
+
+        <!-- CHECKLIST -->
+        <fieldset class="form-section">
+          <legend>Checklist revisión</legend>
+          <div class="checklist-grid">
+            <label><input type="checkbox" value="Batería"> Batería</label>
+            <label><input type="checkbox" value="Motor"> Motor</label>
+            <label><input type="checkbox" value="Frenos"> Frenos</label>
+            <label><input type="checkbox" value="Luces"> Luces</label>
+            <label><input type="checkbox" value="Controlador"> Controlador</label>
+            <label><input type="checkbox" value="Llantas"> Llantas</label>
+            <label><input type="checkbox" value="Cableado"> Cableado</label>
+          </div>
+        </fieldset>
+
+        <!-- OBSERVACIONES -->
+        <fieldset class="form-section">
+          <legend>Observaciones</legend>
+          <textarea id="descripcion" placeholder="Notas adicionales, síntomas, repuestos necesarios..."></textarea>
+        </fieldset>
+
+        <!-- FECHAS -->
+        <fieldset class="form-section">
+          <legend>📅 Fechas del servicio</legend>
+          <div class="field">
+            <label for="fechaIngreso">Fecha de ingreso:</label>
+            <input type="date" id="fechaIngreso" required>
+          </div>
+          <div class="field">
+            <label for="fechaEntrega">Fecha de entrega estimada:</label>
+            <input type="date" id="fechaEntrega">
+          </div>
+        </fieldset>
+
+        <!-- FOTO -->
+        <fieldset class="form-section">
+          <legend>Evidencia fotográfica</legend>
+          <div class="field">
+            <input type="file" id="foto" accept="image/*" capture="environment">
+            <small class="small">📸 Máx. 5MB. En móvil se abrirá la cámara.</small>
+          </div>
+          <div id="preview" class="img-preview">
+            <p class="small">Sin imagen</p>
+          </div>
+        </fieldset>
+
+        <div class="actions">
+          <button type="submit" class="primary" id="btnGuardar">Guardar orden</button>
+          <button type="reset" class="secondary" id="btnLimpiar">Limpiar formulario</button>
+        </div>
+      </form>
+
+      <div id="whatsappBtnContainer" style="text-align:center; margin: 1rem 0;"></div>
+
+      <h2>📋 Últimos registros</h2>
+      <ul id="lista"></ul>
+    </div>
 
   </main>
 
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/app.js"></script>
 </body>

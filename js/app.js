@@ -4,8 +4,16 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ==============================
-// 📌 SELECTORES DOM
+// 📌 ELEMENTOS DOM
 // ==============================
+const authSection = document.getElementById("authSection");
+const appSection = document.getElementById("appSection");
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
+const userEmailSpan = document.getElementById("userEmail");
+const btnLogout = document.getElementById("btnLogout");
+
+// Elementos del formulario
 const form = document.getElementById("form");
 const lista = document.getElementById("lista");
 const preview = document.getElementById("preview");
@@ -18,6 +26,9 @@ const otroContainer = document.getElementById("vehiculoOtroContainer");
 const otroInput = document.getElementById("vehiculoOtro");
 const fechaIngreso = document.getElementById("fechaIngreso");
 const fechaEntrega = document.getElementById("fechaEntrega");
+const whatsappContainer = document.getElementById("whatsappBtnContainer");
+
+let ultimaOrdenGuardada = null;  // para el botón de WhatsApp
 
 // ==============================
 // 🧠 UTILIDADES
@@ -33,6 +44,13 @@ function escapeHtml(str) {
 
 function mostrarPreview(file) {
   if (!file) {
+    preview.innerHTML = '<p class="small">Sin imagen</p>';
+    return;
+  }
+  // VALIDAR TAMAÑO (5 MB)
+  if (file.size > 5 * 1024 * 1024) {
+    alert("❌ La imagen no puede superar 5MB. Por favor, elige una más pequeña.");
+    fotoInput.value = "";
     preview.innerHTML = '<p class="small">Sin imagen</p>';
     return;
   }
@@ -71,10 +89,60 @@ function resetearFormulario() {
     const hoy = new Date().toISOString().split('T')[0];
     fechaIngreso.value = hoy;
   }
+  whatsappContainer.innerHTML = "";
+  ultimaOrdenGuardada = null;
 }
 
 // ==============================
-// 🔌 SUPABASE OPERACIONES
+// 🔐 AUTENTICACIÓN
+// ==============================
+async function handleLogin(email, password) {
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+  return data.user;
+}
+
+async function handleRegister(email, password) {
+  const { data, error } = await supabaseClient.auth.signUp({ email, password });
+  if (error) throw error;
+  return data.user;
+}
+
+async function handleLogout() {
+  await supabaseClient.auth.signOut();
+  mostrarLogin();
+}
+
+async function checkSession() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (session) {
+    mostrarApp(session.user.email);
+  } else {
+    mostrarLogin();
+  }
+}
+
+function mostrarLogin() {
+  authSection.style.display = "block";
+  appSection.style.display = "none";
+  loginForm.style.display = "block";
+  registerForm.style.display = "none";
+}
+
+function mostrarApp(email) {
+  authSection.style.display = "none";
+  appSection.style.display = "block";
+  userEmailSpan.textContent = email;
+  cargarRegistros();
+  // precargar fecha de ingreso
+  if (fechaIngreso && !fechaIngreso.value) {
+    const hoy = new Date().toISOString().split('T')[0];
+    fechaIngreso.value = hoy;
+  }
+}
+
+// ==============================
+// 🔌 SUPABASE OPERACIONES (protegidas por RLS)
 // ==============================
 async function obtenerProximoOrden() {
   const { data, error } = await supabaseClient
@@ -88,6 +156,7 @@ async function obtenerProximoOrden() {
 }
 
 async function subirImagen(file) {
+  if (file.size > 5 * 1024 * 1024) throw new Error("La imagen supera 5MB");
   const fileName = `${Date.now()}-${file.name.replace(/\s/g, "_")}`;
   const { error: uploadError } = await supabaseClient.storage.from("Fotos").upload(fileName, file);
   if (uploadError) throw new Error("Error subiendo imagen: " + uploadError.message);
@@ -139,16 +208,35 @@ async function cargarRegistros() {
 }
 
 // ==============================
-// 📸 EVENTOS
+// 📤 WHATSAPP (resumen automático)
 // ==============================
-fotoInput.addEventListener("change", (e) => mostrarPreview(e.target.files[0]));
-selectVehiculo.addEventListener("change", toggleOtroVehiculo);
-selectServicio.addEventListener("change", actualizarPrecio);
+function generarMensajeWhatsApp(registro, orden) {
+  let mensaje = `📋 *ORDEN DE SERVICIO #${orden}*\n\n`;
+  mensaje += `👤 *Cliente:* ${registro.nombre}\n`;
+  if (registro.telefono) mensaje += `📞 *Teléfono:* ${registro.telefono}\n`;
+  mensaje += `🚗 *Vehículo:* ${registro.vehiculo}\n`;
+  if (registro.id_vehiculo) mensaje += `🔢 *ID/Placa:* ${registro.id_vehiculo}\n`;
+  mensaje += `🔧 *Servicio:* ${registro.servicio}\n`;
+  if (registro.precio) mensaje += `💰 *Precio:* $${registro.precio.toLocaleString()}\n`;
+  mensaje += `📌 *Estado:* ${registro.estado}\n`;
+  if (registro.fecha_ingreso) mensaje += `📅 *Ingreso:* ${registro.fecha_ingreso}\n`;
+  if (registro.fecha_entrega) mensaje += `📅 *Entrega estimada:* ${registro.fecha_entrega}\n`;
+  if (registro.checklist && registro.checklist.length) mensaje += `✅ *Checklist:* ${registro.checklist.join(", ")}\n`;
+  if (registro.obs) mensaje += `📝 *Observaciones:* ${registro.obs}\n`;
+  mensaje += `\n🔗 *Seguimiento:* ${window.location.href}`;
+  return encodeURIComponent(mensaje);
+}
 
-document.getElementById("btnLimpiar").addEventListener("click", (e) => {
-  e.preventDefault();
-  resetearFormulario();
-});
+function agregarBotonWhatsApp(orden, registro) {
+  const numero = registro.telefono ? registro.telefono.replace(/\D/g, '') : '';
+  const mensaje = generarMensajeWhatsApp(registro, orden);
+  const link = `https://wa.me/${numero}?text=${mensaje}`;
+  whatsappContainer.innerHTML = `
+    <a href="${link}" target="_blank" class="whatsapp-btn" style="display:inline-block; background:#25D366; color:white; padding:10px 20px; border-radius:50px; text-decoration:none; font-weight:bold;">
+      📱 Enviar resumen por WhatsApp al cliente
+    </a>
+  `;
+}
 
 // ==============================
 // 💾 SUBMIT
@@ -162,9 +250,14 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
-  // Validar fechas
   if (fechaIngreso.value && fechaEntrega.value && fechaEntrega.value < fechaIngreso.value) {
     alert("La fecha de entrega no puede ser anterior a la fecha de ingreso");
+    return;
+  }
+
+  const file = fotoInput.files[0];
+  if (file && file.size > 5 * 1024 * 1024) {
+    alert("La imagen no puede superar 5MB. Por favor, elige una más pequeña.");
     return;
   }
 
@@ -174,7 +267,6 @@ form.addEventListener("submit", async (e) => {
   try {
     const orden = await obtenerProximoOrden();
 
-    const file = fotoInput.files[0];
     let foto_url = null;
     if (file) {
       foto_url = await subirImagen(file);
@@ -210,6 +302,11 @@ form.addEventListener("submit", async (e) => {
 
     await guardarRegistro(registro);
     alert(`✅ Orden #${orden} guardada correctamente`);
+    
+    // Guardamos datos para el WhatsApp
+    ultimaOrdenGuardada = { orden, registro };
+    agregarBotonWhatsApp(orden, registro);
+    
     resetearFormulario();
     await cargarRegistros();
   } catch (err) {
@@ -222,14 +319,79 @@ form.addEventListener("submit", async (e) => {
 });
 
 // ==============================
+// 🧹 RESET MANUAL
+// ==============================
+document.getElementById("btnLimpiar").addEventListener("click", (e) => {
+  e.preventDefault();
+  resetearFormulario();
+});
+
+// ==============================
+// 📸 PREVIEW DE FOTO
+// ==============================
+fotoInput.addEventListener("change", (e) => mostrarPreview(e.target.files[0]));
+
+// ==============================
+// 🚗 OTRO VEHÍCULO
+// ==============================
+selectVehiculo.addEventListener("change", toggleOtroVehiculo);
+selectServicio.addEventListener("change", actualizarPrecio);
+
+// ==============================
+// 🔐 EVENTOS DE AUTENTICACIÓN
+// ==============================
+document.getElementById("btnLogin").addEventListener("click", async () => {
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  if (!email || !password) return alert("Email y contraseña requeridos");
+  try {
+    await handleLogin(email, password);
+    checkSession();
+  } catch (err) {
+    alert("Error al iniciar sesión: " + err.message);
+  }
+});
+
+document.getElementById("btnShowRegister").addEventListener("click", () => {
+  loginForm.style.display = "none";
+  registerForm.style.display = "block";
+});
+
+document.getElementById("btnShowLogin").addEventListener("click", () => {
+  loginForm.style.display = "block";
+  registerForm.style.display = "none";
+});
+
+document.getElementById("btnRegister").addEventListener("click", async () => {
+  const email = document.getElementById("regEmail").value.trim();
+  const password = document.getElementById("regPassword").value;
+  if (!email || !password) return alert("Email y contraseña requeridos");
+  if (password.length < 6) return alert("La contraseña debe tener al menos 6 caracteres");
+  try {
+    await handleRegister(email, password);
+    alert("Registro exitoso. Ahora inicia sesión.");
+    loginForm.style.display = "block";
+    registerForm.style.display = "none";
+  } catch (err) {
+    alert("Error al registrar: " + err.message);
+  }
+});
+
+btnLogout.addEventListener("click", async () => {
+  await handleLogout();
+});
+
+// ==============================
 // 🚀 INICIO
 // ==============================
 document.addEventListener("DOMContentLoaded", () => {
-  actualizarPrecio();
-  toggleOtroVehiculo();
-  cargarRegistros();
-  if (fechaIngreso && !fechaIngreso.value) {
-    const hoy = new Date().toISOString().split('T')[0];
-    fechaIngreso.value = hoy;
-  }
+  checkSession();
+  // suscripción a cambios de auth
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      mostrarApp(session.user.email);
+    } else if (event === 'SIGNED_OUT') {
+      mostrarLogin();
+    }
+  });
 });
