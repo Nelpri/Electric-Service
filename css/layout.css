@@ -1,0 +1,5 @@
+.container {
+  width: min(600px, 100%);
+  margin: auto;
+  padding: 1rem;
+}

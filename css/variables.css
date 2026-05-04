@@ -1,0 +1,25 @@
+:root {
+  /* Modo claro — azules pastel y tonos armoniosos */
+  --color-bg: #e4eef8;
+  --color-bg-elevated: #ffffff;
+  --color-surface: #d8e8f4;
+  --color-input-bg: #f2f7fc;
+  --color-border: #b8d0e8;
+  --color-border-hover: #9bb9dc;
+  --color-border-focus: #6a9fd4;
+  --color-text: #1f3d5c;
+  --color-text-muted: #5a7a9a;
+  --color-accent: #9ec5eb;
+  --color-accent-mid: #7eb0e0;
+  --color-accent-hover: #6fa2d6;
+  --color-accent-soft: rgba(110, 162, 214, 0.28);
+  --color-lilac-soft: rgba(180, 190, 230, 0.35);
+  --color-danger: #d97a7a;
+  --color-danger-soft: rgba(217, 122, 122, 0.15);
+  --font-sans: "DM Sans", system-ui, -apple-system, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-card: 0 10px 40px rgba(60, 100, 140, 0.1);
+  --transition: 0.18s ease;
+}

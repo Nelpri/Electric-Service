@@ -1,0 +1,42 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap");
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background: var(--color-bg);
+  background-image:
+    radial-gradient(ellipse 100% 70% at 50% -15%, rgba(158, 197, 235, 0.55), transparent 55%),
+    radial-gradient(ellipse 50% 45% at 100% 20%, rgba(200, 210, 245, 0.4), transparent 50%),
+    radial-gradient(ellipse 45% 40% at 0% 80%, rgba(184, 220, 235, 0.45), transparent 45%);
+  line-height: 1.5;
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-align: center;
+  padding: 2rem 1rem 0;
+  color: var(--color-text);
+}
+
+h2 {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
