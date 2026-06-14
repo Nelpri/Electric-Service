@@ -9,6 +9,77 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
+
+  <style>
+    #presupuestoSection {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+    }
+    #presupuestoSection h3 {
+      margin: 0 0 .75rem;
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--color-accent-mid);
+    }
+    .presupuesto-fila {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      margin-bottom: .5rem;
+      flex-wrap: wrap;
+    }
+    .presupuesto-fila input {
+      padding: .5rem .65rem;
+      font-family: inherit;
+      font-size: .875rem;
+      color: var(--color-text);
+      background: var(--color-input-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .presupuesto-fila input:focus {
+      outline: none;
+      border-color: var(--color-border-focus);
+      box-shadow: 0 0 0 3px var(--color-accent-soft);
+    }
+    #presupuestoTotal {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: .75rem;
+      margin-top: .75rem;
+      padding-top: .65rem;
+      border-top: 1px solid var(--color-border);
+      font-size: .9375rem;
+      font-weight: 700;
+      color: var(--color-text);
+    }
+    #totalPresupuesto {
+      color: var(--color-accent-mid);
+      font-size: 1.1rem;
+    }
+    #btnAgregarItem {
+      margin-top: .25rem;
+      font-size: .8125rem;
+      padding: .4rem .9rem;
+      background: var(--color-accent-soft);
+      color: var(--color-accent-mid);
+      border: 1px solid var(--color-border-focus);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 600;
+      transition: background var(--transition);
+    }
+    #btnAgregarItem:hover {
+      background: rgba(110,162,214,.4);
+    }
+  </style>
 </head>
 <body>
 
@@ -19,7 +90,7 @@
       <h1>⚡ Servicio Técnico</h1>
     </div>
 
-    <!-- SECCIÓN DE LOGIN / REGISTRO -->
+    <!-- LOGIN / REGISTRO -->
     <div id="authSection" class="auth-card">
       <div id="loginForm">
         <h2>🔐 Acceso</h2>
@@ -37,14 +108,16 @@
       </div>
     </div>
 
-    <!-- FORMULARIO PRINCIPAL (solo se muestra tras login) -->
+    <!-- APP PRINCIPAL -->
     <div id="appSection" style="display:none;">
+
       <div class="user-info">
         <span>👤 <span id="userEmail"></span></span>
         <button id="btnLogout" class="small">Cerrar sesión</button>
       </div>
 
       <form id="form">
+
         <!-- CLIENTE -->
         <fieldset class="form-section">
           <legend>Cliente</legend>
@@ -55,7 +128,7 @@
             <input id="cedula" placeholder="Cédula / NIT">
           </div>
           <div class="field">
-            <input id="telefono" placeholder="Teléfono / Whatsapp">
+            <input id="telefono" placeholder="Teléfono / WhatsApp">
           </div>
         </fieldset>
 
@@ -99,8 +172,29 @@
             </select>
           </div>
           <div class="field">
-            <p>Precio estimado: <strong id="precioVista">$0</strong></p>
+            <p style="margin:0;font-size:.875rem;color:var(--color-text-muted)">
+              Precio estimado: <strong id="precioVista">$30.000</strong>
+            </p>
           </div>
+
+          <!-- PRESUPUESTO POR ÍTEMS -->
+          <div id="presupuestoSection" style="display:none;">
+            <h3>💼 Detalle del presupuesto</h3>
+            <div style="display:grid;grid-template-columns:60px 1fr 110px 80px 28px;gap:.35rem;margin-bottom:.35rem;padding:0 .25rem">
+              <span style="font-size:.75rem;font-weight:600;color:var(--color-text-muted)">Cant.</span>
+              <span style="font-size:.75rem;font-weight:600;color:var(--color-text-muted)">Descripción</span>
+              <span style="font-size:.75rem;font-weight:600;color:var(--color-text-muted)">P. Unit.</span>
+              <span style="font-size:.75rem;font-weight:600;color:var(--color-text-muted);text-align:right">Subtotal</span>
+              <span></span>
+            </div>
+            <div id="itemsContainer"></div>
+            <button type="button" id="btnAgregarItem">+ Agregar ítem</button>
+            <div id="presupuestoTotal">
+              <span>Total:</span>
+              <span id="totalPresupuesto">$0</span>
+            </div>
+          </div>
+
         </fieldset>
 
         <!-- CHECKLIST -->
@@ -152,14 +246,15 @@
           <button type="submit" class="primary" id="btnGuardar">Guardar orden</button>
           <button type="reset" class="secondary" id="btnLimpiar">Limpiar formulario</button>
         </div>
+
       </form>
 
-      <div id="whatsappBtnContainer" style="text-align:center; margin: 1rem 0;"></div>
+      <div id="whatsappBtnContainer" style="text-align:center;margin:1rem 0;"></div>
 
       <h2>📋 Últimos registros</h2>
       <ul id="lista"></ul>
-    </div>
 
+    </div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
